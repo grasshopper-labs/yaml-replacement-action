@@ -20,7 +20,6 @@
     "@actions/github": "^5.1.1",
     "actions-toolkit": "^6.0.1",
     "fs": "^0.0.1-security",
-    "js-yaml": "^4.1.0",
-    "simple-git": "^3.18.0"
+    "js-yaml": "^4.1.0"
   }
 }

@@ -34,17 +34,8 @@ You need to supply your Personal Access Token (PAT) which allows repository acce
 ## Example usage
 
 ```yaml
-uses: kmanimaran/yaml-replacement-action@v8
+uses: grasshopper-labs/yaml-replacement-action@v1
 with:
-  yaml-file-path: 'setting.yaml'
-  target-key: 'step.revision'
-  target-value: 'value'
-  need-push: true
-```
-
-In the above example, the setting.yaml file should be in the following format:
-
-```yaml
-step:
-  revision: '202301011200' # <- replace
+  filePath: '/path/setting.yaml'
+  keyValueStr: 'global.image.name=test,global.image.tag=v1'
 ```

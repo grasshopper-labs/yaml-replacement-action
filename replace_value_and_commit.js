@@ -1,81 +1,50 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const yaml = require('js-yaml');
-const git = require('simple-git');
 
-const main = async (folders, targetKey, targetValue, needPush) => {
-
-    let folderslist = folders.toString();
-    let foldersObj = JSON.parse(folderslist);
-
-    console.log("Folder list");
-    console.log(foldersObj);
-
-    let yamlFilePath = "";
-    const gitRepo = git();
-
-    for(const element of foldersObj) {
-
-        yamlFilePath = element + "/Chart.yaml";
-        const text = await fs.promises.readFile(yamlFilePath, 'utf8').catch((error) => {
-            throw new Error(`Error reading YAML file: ${error.message}`);
-        });
-        let yamlContent = yaml.load(text);
-    
-        let result;
-        try {
-            console.log("Replacing with value: " + targetValue + " for " + yamlFilePath);
-            result = replaceYamlContents(yamlContent, targetKey, targetValue);
-        } catch (error) {
-            throw new Error(`Error replacing YAML value: ${error.message}`);
-        }
-        let updatedYaml = yaml.dump(yamlContent);
-        console.log("Updated YAML");
-        console.log(updatedYaml);
-        await fs.promises.writeFile(yamlFilePath, updatedYaml, 'utf8').catch((error) => {
-            throw new Error(`Error writing updated YAML file: ${error.message}`);
-        });
-        await gitRepo.add(yamlFilePath).catch((error) => {
-            throw new Error(`Error adding file to git: ${error.message}`);
-        });
-    };
-
-    console.log('YAML value replacement successfully.');
-    if (needPush === 'false') {
-        return;
-    }
-    
-    await gitRepo.addConfig('user.name', 'github-actions[bot]');
-    await gitRepo.addConfig('user.email', 'github-actions[bot]@users.noreply.github.com');
-    await gitRepo.addConfig('push.autoSetupRemote', true);
-
-    await gitRepo.commit(`Replace Helm version to ${targetValue} [ci skip]`).catch((error) => {
-        throw new Error(`Error committing changes: ${error.message}`);
-    });
-    await gitRepo.push().catch((error) => {
-        throw new Error(`Error pushing changes: ${error.message}`);
-    });
-}
-
-const replaceYamlContents = (obj, key, targetValue) => {
+const main = async (filePath, keyValueStr) => {
+  if (!filePath || !keyValueStr) {
+    throw new Error('Both "filePath" and "keyValueStr" must be provided.');
+  }
+  console.log(`Path is ${filePath}, values to update: ${keyValuePairs}`);
+  const keyValuePairs = keyValueStr.split(',').reduce((acc, pair) => {
+    const [key, value] = pair.split('=');
     const keys = key.split('.');
-    const lastKey = keys.pop();
+    let current = acc;
+    keys.forEach((k, i) => {
+      if (i === keys.length - 1) {
+        current[k] = value === 'true' ? true : value === 'false' ? false : value;
+      } else {
+        current[k] = current[k] || {};
+        current = current[k];
+      }
+    });
+    return acc;
+  }, {});
 
-    let current = obj;
-    for (const key of keys) {
-        if (!current.hasOwnProperty(key)) {
-            throw new Error(`Key "${keyPath}" not found in YAML file.`);
+  try {
+    // Load the YAML file
+    const fileContents = await fs.readFile(filePath, 'utf8');
+    let yamlData = yaml.load(fileContents);
+
+    // Merge the updated key-value pairs into the YAML data
+    function mergeDeep(target, source) {
+      for (const key in source) {
+        if (source[key] instanceof Object && key in target) {
+          Object.assign(source[key], mergeDeep(target[key], source[key]));
         }
-        current = current[key];
+      }
+      return { ...target, ...source };
     }
-    if (!current.hasOwnProperty(lastKey)) {
-        throw new Error(`Key "${lastKey}" not found in YAML file.`);
-    }
-    console.log(`Replaced from ${current[lastKey]} to ${targetValue}`);
-    current[lastKey] = targetValue;
-    return {
-        old: current[lastKey],
-        new: targetValue
-    };
+
+    const updatedYamlData = mergeDeep(yamlData, keyValuePairs);
+
+    // Save the updated YAML back to the file
+    const newYaml = yaml.dump(updatedYamlData);
+    await fs.writeFile(filePath, newYaml, 'utf8');
+    console.log('YAML file updated successfully!');
+  } catch (e) {
+    console.error(`Error processing YAML file: ${e}`);
+  }
 }
 
 module.exports = { main };

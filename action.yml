@@ -1,20 +1,12 @@
 name: 'YAML generic value replacement'
-description: 'Replace specific value in YAML file'
+description: 'Replace specific value/s in YAML file'
 inputs:
-  folders:
+  filePath:
     description: 'List of folders'
     required: true
-  target-key:
-    description: 'Key to replace in the YAML file'
+  keyValueStr:
+    description: 'Keys to replace in the YAML file'
     required: true
-  target-value:
-    description: 'Value to replace in the YAML file'
-    required: true
-    default: ''    
-  need-push:
-    description: 'Need commit & push YAML replacement'
-    required: true
-    default: false
 runs:
   using: 'node20'
   main: 'dist/index.js'
