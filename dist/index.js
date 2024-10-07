@@ -31709,11 +31709,9 @@ const { main } = __nccwpck_require__(7570);
 
 (() => {
   try {
-    const folders = core.getInput('folders');
-    const targetKey = core.getInput('target-key');
-    const needPush = core.getInput('need-push');
-    const targetValue = core.getInput('target-value');
-    main(folders, targetKey, targetValue, needPush);
+    const filePath = core.getInput('filePath');
+    const keyValueStr = core.getInput('keyValueStr');
+    main(filePath, keyValueStr);
   } catch (error) {
     core.setFailed(error.message);
   }

@@ -4,21 +4,15 @@ This action replaces specific value in all Helm Chart YAML files in an array of 
 
 ## Inputs
 
-### `folders`
+### `filePath`
 
-**Required** Array of chart folders.
+**Required** Path to the YAML you want to edit
 
-### `target-key`
+### `keyValueStr`
 
-**Required** The key of the value that needs to be replaced in the YAML file.
+**Required** Keys you want to edit, for example:
+`global.image.name=test,global.image.tag=v1`
 
-### `target-value`
-
-**Required** The value for the key that needs to be replaced in the YAML file.
-
-### `need-push`
-
-If you need to push these changes, set `true`, default `false`
 
 **Notice**
 You need to supply your Personal Access Token (PAT) which allows repository access to the checkout action. For example:
