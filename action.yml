@@ -1,4 +1,4 @@
-name: 'YAML generic value replacement'
+name: 'YAML values replacement'
 description: 'Replace specific value/s in YAML file'
 inputs:
   filePath:
