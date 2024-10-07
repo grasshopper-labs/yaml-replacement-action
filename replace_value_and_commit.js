@@ -5,7 +5,7 @@ const main = async (filePath, keyValueStr) => {
   if (!filePath || !keyValueStr) {
     throw new Error('Both "filePath" and "keyValueStr" must be provided.');
   }
-  console.log(`Path is ${filePath}, values to update: ${keyValuePairs}`);
+  console.log(`Path is ${filePath}, values to update: ${keyValueStr}`);
   const keyValuePairs = keyValueStr.split(',').reduce((acc, pair) => {
     const [key, value] = pair.split('=');
     const keys = key.split('.');
