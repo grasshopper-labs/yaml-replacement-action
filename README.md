@@ -28,7 +28,7 @@ You need to supply your Personal Access Token (PAT) which allows repository acce
 ## Example usage
 
 ```yaml
-uses: grasshopper-labs/yaml-replacement-action@v3
+uses: grasshopper-labs/yaml-replacement-action@v1
 with:
   filePath: '/path/setting.yaml'
   keyValueStr: 'global.image.name=test,global.image.tag=v1'
